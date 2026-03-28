@@ -1,0 +1,177 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+<div class="main-content">
+  <div class="topbar">
+    <h1>Question Bank</h1>
+    <% if (selectedExam) { %>
+    <button class="btn btn-primary" onclick="toggleModal('addQuestionModal')">+ Add Question</button>
+    <% } %>
+  </div>
+
+  <!-- Exam Selector -->
+  <div class="card">
+    <h2>Select Exam</h2>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <% exams.forEach(e => { %>
+        <a href="/faculty/questions?exam_id=<%= e.id %>" class="btn <%= examId == e.id ? 'btn-primary' : 'btn-outline' %> btn-sm">
+          <%= e.subject_name %> - <%= e.name %>
+        </a>
+      <% }) %>
+      <% if (exams.length === 0) { %>
+        <p style="color:#999;">No exams created yet. Create an exam first.</p>
+      <% } %>
+    </div>
+  </div>
+
+  <% if (selectedExam) { %>
+  <div class="card">
+    <h2>Questions for: <%= selectedExam.subject_name %> - <%= selectedExam.name %> (<%= questions.length %> questions)</h2>
+    <% if (questions.length === 0) { %>
+      <p style="color:#999; text-align:center; padding:20px;">No questions added yet. Click "+ Add Question" to start.</p>
+    <% } %>
+    <% questions.forEach((q, i) => { %>
+    <div style="border:1px solid #eee; border-radius:8px; padding:20px; margin-bottom:15px; background:#fafafa;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div style="flex:1;">
+          <p style="font-weight:600; margin-bottom:10px;">Q<%= i + 1 %>. <%= q.question_text %> <span class="badge badge-info"><%= q.marks %> mark<%= q.marks > 1 ? 's' : '' %></span></p>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-left:20px;">
+            <p style="<%= q.correct_option === 'A' ? 'color:green; font-weight:600;' : '' %>">A) <%= q.option_a %> <%= q.correct_option === 'A' ? '✓' : '' %></p>
+            <p style="<%= q.correct_option === 'B' ? 'color:green; font-weight:600;' : '' %>">B) <%= q.option_b %> <%= q.correct_option === 'B' ? '✓' : '' %></p>
+            <p style="<%= q.correct_option === 'C' ? 'color:green; font-weight:600;' : '' %>">C) <%= q.option_c %> <%= q.correct_option === 'C' ? '✓' : '' %></p>
+            <p style="<%= q.correct_option === 'D' ? 'color:green; font-weight:600;' : '' %>">D) <%= q.option_d %> <%= q.correct_option === 'D' ? '✓' : '' %></p>
+          </div>
+        </div>
+        <div style="display:flex; gap:5px; margin-left:15px;">
+          <button class="btn btn-warning btn-sm" onclick='editQuestion(<%= JSON.stringify({id:q.id, question_text:q.question_text, option_a:q.option_a, option_b:q.option_b, option_c:q.option_c, option_d:q.option_d, correct_option:q.correct_option, marks:q.marks}) %>)'>Edit</button>
+          <form method="POST" action="/faculty/questions/delete/<%= q.id %>" style="display:inline;" onsubmit="return confirm('Delete this question?')">
+            <input type="hidden" name="exam_id" value="<%= examId %>">
+            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } %>
+</div>
+
+<!-- Add Question Modal -->
+<div class="modal-overlay" id="addQuestionModal">
+  <div class="modal" style="max-width:600px;">
+    <h2>Add Question</h2>
+    <form method="POST" action="/faculty/questions/add">
+      <input type="hidden" name="exam_id" value="<%= examId %>">
+      <div class="form-group">
+        <label>Question</label>
+        <textarea name="question_text" class="form-control" rows="3" required placeholder="Enter the question..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Option A</label>
+          <input type="text" name="option_a" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Option B</label>
+          <input type="text" name="option_b" class="form-control" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Option C</label>
+          <input type="text" name="option_c" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Option D</label>
+          <input type="text" name="option_d" class="form-control" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Correct Answer</label>
+          <select name="correct_option" class="form-control" required>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Marks</label>
+          <input type="number" name="marks" class="form-control" value="1" min="1" max="10">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" onclick="toggleModal('addQuestionModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Add Question</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Question Modal -->
+<div class="modal-overlay" id="editQuestionModal">
+  <div class="modal" style="max-width:600px;">
+    <h2>Edit Question</h2>
+    <form method="POST" id="editQuestionForm">
+      <input type="hidden" name="exam_id" value="<%= examId %>">
+      <div class="form-group">
+        <label>Question</label>
+        <textarea name="question_text" id="editQText" class="form-control" rows="3" required></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Option A</label>
+          <input type="text" name="option_a" id="editQA" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Option B</label>
+          <input type="text" name="option_b" id="editQB" class="form-control" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Option C</label>
+          <input type="text" name="option_c" id="editQC" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Option D</label>
+          <input type="text" name="option_d" id="editQD" class="form-control" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Correct Answer</label>
+          <select name="correct_option" id="editQCorrect" class="form-control" required>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Marks</label>
+          <input type="number" name="marks" id="editQMarks" class="form-control" min="1" max="10">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" onclick="toggleModal('editQuestionModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function editQuestion(q) {
+  document.getElementById('editQuestionForm').action = '/faculty/questions/edit/' + q.id;
+  document.getElementById('editQText').value = q.question_text;
+  document.getElementById('editQA').value = q.option_a;
+  document.getElementById('editQB').value = q.option_b;
+  document.getElementById('editQC').value = q.option_c;
+  document.getElementById('editQD').value = q.option_d;
+  document.getElementById('editQCorrect').value = q.correct_option;
+  document.getElementById('editQMarks').value = q.marks;
+  toggleModal('editQuestionModal');
+}
+</script>
+<%- include('../partials/footer') %>

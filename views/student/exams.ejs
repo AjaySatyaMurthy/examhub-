@@ -1,0 +1,60 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+<div class="main-content">
+  <div class="topbar">
+    <h1>Available Exams</h1>
+  </div>
+
+  <% if (student) { %>
+  <div class="card">
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Exam Name</th><th>Subject</th><th>Date</th><th>Time</th><th>Total Marks</th><th>Questions</th><th>Status</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% exams.forEach((e, i) => { %>
+          <tr>
+            <td><%= i + 1 %></td>
+            <td><%= e.name %></td>
+            <td><%= e.subject_name %> (<%= e.subject_code %>)</td>
+            <td><%= new Date(e.exam_date).toLocaleDateString() %></td>
+            <td><%= e.start_time %> - <%= e.end_time %></td>
+            <td><%= e.total_marks %></td>
+            <td><%= e.question_count %></td>
+            <td>
+              <% if (e.attempt_status === 'submitted') { %>
+                <span class="badge badge-success">Completed</span>
+              <% } else if (e.attempt_status === 'in_progress') { %>
+                <span class="badge badge-warning">In Progress</span>
+              <% } else { %>
+                <span class="badge badge-info">Available</span>
+              <% } %>
+            </td>
+            <td>
+              <% if (e.attempt_status === 'submitted') { %>
+                <a href="/student/exam/<%= e.id %>/result" class="btn btn-success btn-sm">View Result</a>
+              <% } else { %>
+                <a href="/student/exam/<%= e.id %>" class="btn btn-primary btn-sm" onclick="return confirm('<%= e.attempt_status === 'in_progress' ? 'Continue your exam?' : 'Are you sure you want to start this exam? The timer will begin immediately.' %>')">
+                  <%= e.attempt_status === 'in_progress' ? 'Continue' : 'Start Exam' %>
+                </a>
+              <% } %>
+            </td>
+          </tr>
+          <% }) %>
+          <% if (exams.length === 0) { %>
+          <tr><td colspan="9" style="text-align:center; color:#999;">No exams available right now</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <% } else { %>
+  <div class="card">
+    <p style="text-align:center; color:#999;">Student profile not found. Contact administrator.</p>
+  </div>
+  <% } %>
+</div>
+<%- include('../partials/footer') %>

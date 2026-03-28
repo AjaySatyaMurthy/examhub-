@@ -1,0 +1,42 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+<div class="main-content">
+  <div class="topbar">
+    <h1>Results</h1>
+  </div>
+
+  <div class="card">
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Roll No</th><th>Student</th><th>Exam</th><th>Subject</th><th>Marks</th><th>Percentage</th><th>Grade</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% results.forEach((r, i) => { %>
+          <tr>
+            <td><%= i + 1 %></td>
+            <td><%= r.roll_number %></td>
+            <td><%= r.student_name %></td>
+            <td><%= r.exam_name %></td>
+            <td><%= r.subject_name %></td>
+            <td><%= r.marks_obtained !== null ? r.marks_obtained : '-' %> / <%= r.total_marks %></td>
+            <td><%= r.percentage %>%</td>
+            <td><%= r.grade %></td>
+            <td>
+              <span class="badge badge-<%= r.result_status === 'pass' ? 'success' : r.result_status === 'fail' ? 'danger' : 'secondary' %>">
+                <%= r.result_status.toUpperCase() %>
+              </span>
+            </td>
+          </tr>
+          <% }) %>
+          <% if (results.length === 0) { %>
+          <tr><td colspan="9" style="text-align:center; color:#999;">No results available</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

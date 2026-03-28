@@ -1,0 +1,42 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+<div class="main-content">
+  <div class="topbar">
+    <h1>My Hall Tickets</h1>
+  </div>
+
+  <% if (tickets.length > 0) { %>
+    <% tickets.forEach(t => { %>
+    <div class="hall-ticket" id="ticket-<%= t.id %>">
+      <h2>HALL TICKET</h2>
+      <hr style="margin:15px 0;">
+      <div class="details">
+        <div class="form-row">
+          <div>
+            <p><strong>Ticket No:</strong> <%= t.ticket_number %></p>
+            <p><strong>Student Name:</strong> <%= user.name %></p>
+            <p><strong>Roll Number:</strong> <%= student.roll_number %></p>
+          </div>
+          <div>
+            <p><strong>Exam:</strong> <%= t.exam_name %></p>
+            <p><strong>Subject:</strong> <%= t.subject_name %> (<%= t.subject_code %>)</p>
+            <p><strong>Date:</strong> <%= new Date(t.exam_date).toLocaleDateString() %></p>
+            <p><strong>Time:</strong> <%= t.start_time %> - <%= t.end_time %></p>
+            <p><strong>Room:</strong> <%= t.room || 'TBD' %></p>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <p style="text-align:center; font-size:0.8rem; color:#999; margin-top:10px;">
+        This is a computer-generated hall ticket. No signature required.
+      </p>
+    </div>
+    <button class="btn btn-primary no-print" onclick="window.print()" style="margin-bottom:20px;">Print Hall Ticket</button>
+    <% }) %>
+  <% } else { %>
+  <div class="card">
+    <p style="text-align:center; color:#999;">No hall tickets issued yet</p>
+  </div>
+  <% } %>
+</div>
+<%- include('../partials/footer') %>

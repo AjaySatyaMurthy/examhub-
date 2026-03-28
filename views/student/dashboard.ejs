@@ -1,0 +1,83 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+<div class="main-content">
+  <div class="topbar">
+    <h1>Student Dashboard</h1>
+    <div class="user-info">
+      <span>Welcome, <%= user.name %></span>
+      <a href="/logout" class="btn btn-outline btn-sm">Logout</a>
+    </div>
+  </div>
+
+  <% if (student) { %>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h3><%= student.roll_number %></h3>
+      <p>Roll Number</p>
+    </div>
+    <div class="stat-card">
+      <h3><%= student.dept_name %></h3>
+      <p>Department</p>
+    </div>
+    <div class="stat-card">
+      <h3>Semester <%= student.semester %></h3>
+      <p>Current Semester</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Upcoming Exams</h2>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr><th>#</th><th>Exam</th><th>Subject</th><th>Date</th><th>Time</th></tr>
+        </thead>
+        <tbody>
+          <% upcomingExams.forEach((e, i) => { %>
+          <tr>
+            <td><%= i + 1 %></td>
+            <td><%= e.name %></td>
+            <td><%= e.subject_name %></td>
+            <td><%= new Date(e.exam_date).toLocaleDateString() %></td>
+            <td><%= e.start_time %> - <%= e.end_time %></td>
+          </tr>
+          <% }) %>
+          <% if (upcomingExams.length === 0) { %>
+          <tr><td colspan="5" style="text-align:center; color:#999;">No upcoming exams</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Recent Results</h2>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr><th>Exam</th><th>Subject</th><th>Marks</th><th>Grade</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <% recentResults.forEach(r => { %>
+          <tr>
+            <td><%= r.exam_name %></td>
+            <td><%= r.subject_name %></td>
+            <td><%= r.marks_obtained !== null ? r.marks_obtained : '-' %> / <%= r.total_marks %></td>
+            <td><%= r.grade %></td>
+            <td><span class="badge badge-<%= r.result_status === 'pass' ? 'success' : 'danger' %>"><%= r.result_status.toUpperCase() %></span></td>
+          </tr>
+          <% }) %>
+          <% if (recentResults.length === 0) { %>
+          <tr><td colspan="5" style="text-align:center; color:#999;">No results yet</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <% } else { %>
+  <div class="card">
+    <p style="text-align:center; color:#999;">Your student profile has not been set up yet. Please contact the administrator.</p>
+  </div>
+  <% } %>
+</div>
+<%- include('../partials/footer') %>

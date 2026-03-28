@@ -1,0 +1,180 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+<div class="main-content">
+  <div class="topbar">
+    <h1>Student Management</h1>
+    <button class="btn btn-primary" onclick="toggleModal('addStudentModal')">+ Add Student</button>
+  </div>
+
+  <div class="card">
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Roll No</th><th>Name</th><th>Email</th><th>Department</th><th>Semester</th><th>Year</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% students.forEach((s, i) => { %>
+          <tr>
+            <td><%= i + 1 %></td>
+            <td><%= s.roll_number %></td>
+            <td><%= s.name %></td>
+            <td><%= s.email %></td>
+            <td><%= s.dept_name %></td>
+            <td><%= s.semester %></td>
+            <td><%= s.year_of_admission %></td>
+            <td>
+              <button class="btn btn-warning btn-sm" onclick='editStudent(<%= JSON.stringify({id: s.id, name: s.name, email: s.email, phone: s.phone || "", roll_number: s.roll_number, department_id: s.department_id, semester: s.semester, year_of_admission: s.year_of_admission}) %>)'>Edit</button>
+              <form method="POST" action="/admin/students/delete/<%= s.id %>" style="display:inline;" onsubmit="return confirm('Delete this student?')">
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+              </form>
+            </td>
+          </tr>
+          <% }) %>
+          <% if (students.length === 0) { %>
+          <tr><td colspan="8" style="text-align:center; color:#999;">No students added yet</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Add Student Modal -->
+<div class="modal-overlay" id="addStudentModal">
+  <div class="modal">
+    <h2>Add Student</h2>
+    <form method="POST" action="/admin/students/add">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" name="name" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Roll Number</label>
+          <input type="text" name="roll_number" class="form-control" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" class="form-control" required minlength="6">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="text" name="phone" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>Department</label>
+          <select name="department_id" class="form-control" required>
+            <option value="">Select Department</option>
+            <% departments.forEach(d => { %>
+            <option value="<%= d.id %>"><%= d.name %></option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Semester</label>
+          <select name="semester" class="form-control" required>
+            <% for(let i = 1; i <= 8; i++) { %>
+            <option value="<%= i %>">Semester <%= i %></option>
+            <% } %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Year of Admission</label>
+          <input type="number" name="year_of_admission" class="form-control" required min="2020" max="2030" value="2024">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" onclick="toggleModal('addStudentModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Add Student</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Student Modal -->
+<div class="modal-overlay" id="editStudentModal">
+  <div class="modal">
+    <h2>Edit Student</h2>
+    <form method="POST" id="editStudentForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" name="name" id="editStudentName" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Roll Number</label>
+          <input type="text" name="roll_number" id="editStudentRoll" class="form-control" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" id="editStudentEmail" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="text" name="phone" id="editStudentPhone" class="form-control">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Department</label>
+          <select name="department_id" id="editStudentDept" class="form-control" required>
+            <% departments.forEach(d => { %>
+            <option value="<%= d.id %>"><%= d.name %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Semester</label>
+          <select name="semester" id="editStudentSemester" class="form-control" required>
+            <% for(let i = 1; i <= 8; i++) { %>
+            <option value="<%= i %>">Semester <%= i %></option>
+            <% } %>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Year of Admission</label>
+          <input type="number" name="year_of_admission" id="editStudentYear" class="form-control" required min="2020" max="2030">
+        </div>
+        <div class="form-group">
+          <label>New Password (leave blank to keep current)</label>
+          <input type="password" name="password" class="form-control" minlength="6">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" onclick="toggleModal('editStudentModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function editStudent(s) {
+  document.getElementById('editStudentForm').action = '/admin/students/edit/' + s.id;
+  document.getElementById('editStudentName').value = s.name;
+  document.getElementById('editStudentEmail').value = s.email;
+  document.getElementById('editStudentPhone').value = s.phone;
+  document.getElementById('editStudentRoll').value = s.roll_number;
+  document.getElementById('editStudentDept').value = s.department_id;
+  document.getElementById('editStudentSemester').value = s.semester;
+  document.getElementById('editStudentYear').value = s.year_of_admission;
+  toggleModal('editStudentModal');
+}
+</script>
+<%- include('../partials/footer') %>

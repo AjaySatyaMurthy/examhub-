@@ -1,0 +1,66 @@
+<%- include('partials/header') %>
+<div class="login-container">
+  <div class="login-box">
+    <h1>ExamHub</h1>
+    <p class="subtitle">Sign in to your account</p>
+    <% if (error) { %>
+      <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+    <form method="POST" action="/login">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" class="form-control" required placeholder="Enter your email">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" class="form-control" required placeholder="Enter your password">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">Sign In</button>
+    </form>
+    <p style="text-align:right; margin-top:10px; font-size:0.85rem;">
+      <a href="#" onclick="toggleModal('forgotModal')" style="color:var(--primary);">Forgot password?</a>
+    </p>
+    <p style="text-align:center; margin-top:10px; font-size:0.85rem; color:#6c757d;">
+      New student? <a href="/register" style="color:var(--primary);">Register here</a>
+    </p>
+  </div>
+</div>
+
+<!-- Forgot Password Modal -->
+<div class="modal-overlay" id="forgotModal">
+  <div class="modal">
+    <h2>Reset Password</h2>
+    <% if (typeof fpError !== 'undefined' && fpError) { %>
+      <div class="alert alert-danger"><%= fpError %></div>
+    <% } %>
+    <% if (typeof fpSuccess !== 'undefined' && fpSuccess) { %>
+      <div class="alert alert-success"><%= fpSuccess %></div>
+    <% } %>
+    <form method="POST" action="/forgot-password">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" class="form-control" required placeholder="Enter your registered email">
+      </div>
+      <div class="form-group">
+        <label>New Password</label>
+        <input type="password" name="new_password" class="form-control" required minlength="6" placeholder="Enter new password">
+      </div>
+      <div class="form-group">
+        <label>Confirm Password</label>
+        <input type="password" name="confirm_password" class="form-control" required minlength="6" placeholder="Confirm new password">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" onclick="toggleModal('forgotModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Reset Password</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  <% if (typeof showForgot !== 'undefined' && showForgot) { %>
+    document.addEventListener('DOMContentLoaded', () => toggleModal('forgotModal'));
+  <% } %>
+</script>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,12 @@
+<%- include('partials/header') %>
+<% if (user) { %>
+  <%- include('partials/sidebar') %>
+<% } %>
+<div class="<%= user ? 'main-content' : 'login-container' %>">
+  <div class="card" style="text-align:center; max-width:500px; margin:50px auto;">
+    <h2 style="color:var(--danger); margin-bottom:15px;">Error</h2>
+    <p><%= message %></p>
+    <a href="/" class="btn btn-primary" style="margin-top:20px;">Go Home</a>
+  </div>
+</div>
+<%- include('partials/footer') %>

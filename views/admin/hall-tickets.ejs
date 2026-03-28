@@ -1,0 +1,72 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+<div class="main-content">
+  <div class="topbar">
+    <h1>Hall Ticket Generation</h1>
+  </div>
+
+  <div class="card">
+    <h2>Scheduled Exams</h2>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Exam Name</th><th>Subject</th><th>Date</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% exams.forEach((e, i) => { %>
+          <tr>
+            <td><%= i + 1 %></td>
+            <td><%= e.name %></td>
+            <td><%= e.subject_name %> (<%= e.subject_code %>)</td>
+            <td><%= new Date(e.exam_date).toLocaleDateString() %></td>
+            <td>
+              <form method="POST" action="/admin/hall-tickets/generate/<%= e.id %>" style="display:inline;">
+                <button type="submit" class="btn btn-success btn-sm">Generate Hall Tickets</button>
+              </form>
+            </td>
+          </tr>
+          <% }) %>
+          <% if (exams.length === 0) { %>
+          <tr><td colspan="5" style="text-align:center; color:#999;">No scheduled exams</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Generated Hall Tickets -->
+  <div class="card">
+    <h2>Generated Hall Tickets (<%= tickets.length %>)</h2>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Ticket No</th><th>Roll No</th><th>Student Name</th><th>Exam</th><th>Subject</th><th>Date</th><th>Time</th><th>Room</th><th>Issued At</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% tickets.forEach((t, i) => { %>
+          <tr>
+            <td><%= i + 1 %></td>
+            <td><strong><%= t.ticket_number %></strong></td>
+            <td><%= t.roll_number %></td>
+            <td><%= t.student_name %></td>
+            <td><%= t.exam_name %></td>
+            <td><%= t.subject_name %> (<%= t.subject_code %>)</td>
+            <td><%= new Date(t.exam_date).toLocaleDateString() %></td>
+            <td><%= t.start_time %> - <%= t.end_time %></td>
+            <td><%= t.room || 'TBD' %></td>
+            <td><%= new Date(t.issued_at).toLocaleString() %></td>
+          </tr>
+          <% }) %>
+          <% if (tickets.length === 0) { %>
+          <tr><td colspan="10" style="text-align:center; color:#999;">No hall tickets generated yet</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

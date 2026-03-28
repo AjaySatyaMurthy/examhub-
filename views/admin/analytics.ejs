@@ -1,0 +1,87 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+<div class="main-content">
+  <div class="topbar">
+    <h1>Performance Analytics</h1>
+  </div>
+
+  <div class="card">
+    <h2>Exam-wise Performance</h2>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Exam</th><th>Subject</th><th>Total Students</th><th>Passed</th><th>Failed</th>
+            <th>Pass %</th><th>Avg %</th><th>Highest</th><th>Lowest</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% examStats.forEach(e => { %>
+          <tr>
+            <td><%= e.exam_name %></td>
+            <td><%= e.subject_name %></td>
+            <td><%= e.total_students %></td>
+            <td><span class="badge badge-success"><%= e.passed %></span></td>
+            <td><span class="badge badge-danger"><%= e.failed %></span></td>
+            <td><%= e.total_students > 0 ? ((e.passed / e.total_students) * 100).toFixed(1) : 0 %>%</td>
+            <td><%= e.avg_percentage || 0 %>%</td>
+            <td><%= e.highest_marks || '-' %></td>
+            <td><%= e.lowest_marks || '-' %></td>
+          </tr>
+          <% }) %>
+          <% if (examStats.length === 0) { %>
+          <tr><td colspan="9" style="text-align:center; color:#999;">No exam data available</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Department-wise Performance</h2>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Department</th><th>Total Students</th><th>Passed</th><th>Avg Percentage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% deptStats.forEach(d => { %>
+          <tr>
+            <td><%= d.dept_name %></td>
+            <td><%= d.total_students %></td>
+            <td><span class="badge badge-success"><%= d.passed %></span></td>
+            <td><%= d.avg_percentage || 0 %>%</td>
+          </tr>
+          <% }) %>
+          <% if (deptStats.length === 0) { %>
+          <tr><td colspan="4" style="text-align:center; color:#999;">No department data available</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Simple bar chart using CSS -->
+  <% if (examStats.length > 0) { %>
+  <div class="card">
+    <h2>Pass Rate Visualization</h2>
+    <div style="padding: 20px 0;">
+      <% examStats.forEach(e => { %>
+        <% const passRate = e.total_students > 0 ? ((e.passed / e.total_students) * 100).toFixed(1) : 0; %>
+        <div style="margin-bottom: 15px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+            <span style="font-size:0.85rem; font-weight:500;"><%= e.exam_name %></span>
+            <span style="font-size:0.85rem; color:#666;"><%= passRate %>%</span>
+          </div>
+          <div style="background:#eee; border-radius:10px; height:20px; overflow:hidden;">
+            <div style="background: <%= passRate >= 70 ? 'var(--success)' : passRate >= 40 ? 'var(--warning)' : 'var(--danger)' %>; height:100%; width:<%= passRate %>%; border-radius:10px; transition: width 0.5s;"></div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+  <% } %>
+</div>
+<%- include('../partials/footer') %>

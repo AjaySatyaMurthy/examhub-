@@ -1,0 +1,127 @@
+<%- include('../partials/header') %>
+<style>
+  .exam-container { max-width: 900px; margin: 0 auto; padding: 20px; }
+  .exam-header {
+    background: var(--dark); color: white; padding: 15px 25px;
+    border-radius: 10px; margin-bottom: 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .exam-header h2 { font-size: 1.1rem; margin: 0; }
+  .timer {
+    background: var(--danger); padding: 8px 20px; border-radius: 6px;
+    font-size: 1.2rem; font-weight: 700; min-width: 100px; text-align: center;
+  }
+  .timer.warning { background: var(--warning); }
+  .question-card {
+    background: white; border-radius: 10px; padding: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 15px;
+  }
+  .question-card h3 { font-size: 1rem; margin-bottom: 15px; color: var(--dark); }
+  .option-label {
+    display: block; padding: 12px 15px; margin-bottom: 8px;
+    border: 2px solid #eee; border-radius: 8px; cursor: pointer;
+    transition: all 0.2s; font-size: 0.9rem;
+  }
+  .option-label:hover { border-color: var(--primary); background: #f0f4ff; }
+  .option-label input { margin-right: 10px; }
+  .option-label.selected { border-color: var(--primary); background: #e8eeff; }
+  .question-nav {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;
+    background: white; padding: 15px; border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  .q-nav-btn {
+    width: 40px; height: 40px; border: 2px solid #ddd; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-weight: 600; font-size: 0.85rem; background: white;
+    transition: all 0.2s;
+  }
+  .q-nav-btn.answered { background: var(--success); color: white; border-color: var(--success); }
+  .q-nav-btn.current { border-color: var(--primary); color: var(--primary); }
+  .exam-actions { text-align: center; margin-top: 20px; }
+</style>
+
+<div class="exam-container">
+  <div class="exam-header">
+    <div>
+      <h2><%= exam.subject_name %> - <%= exam.name %></h2>
+      <small>Total: <%= questions.length %> questions | <%= questions.reduce((s, q) => s + q.marks, 0) %> marks</small>
+    </div>
+    <div class="timer" id="timer">--:--</div>
+  </div>
+
+  <!-- Question Navigation -->
+  <div class="question-nav" id="questionNav">
+    <% questions.forEach((q, i) => { %>
+      <div class="q-nav-btn <%= answersMap[q.id] ? 'answered' : '' %>" onclick="scrollToQuestion(<%= i %>)" id="nav-<%= i %>"><%= i + 1 %></div>
+    <% }) %>
+  </div>
+
+  <form id="examForm" method="POST" action="/student/exam/<%= exam.id %>/submit">
+    <% questions.forEach((q, i) => { %>
+    <div class="question-card" id="question-<%= i %>">
+      <h3>Q<%= i + 1 %>. <%= q.question_text %> <span class="badge badge-info" style="font-weight:normal;"><%= q.marks %> mark<%= q.marks > 1 ? 's' : '' %></span></h3>
+      <label class="option-label <%= answersMap[q.id] === 'A' ? 'selected' : '' %>" id="opt-<%= q.id %>-A">
+        <input type="radio" name="answer_<%= q.id %>" value="A" <%= answersMap[q.id] === 'A' ? 'checked' : '' %> onchange="saveAnswer(<%= q.id %>, 'A', <%= i %>)"> A) <%= q.option_a %>
+      </label>
+      <label class="option-label <%= answersMap[q.id] === 'B' ? 'selected' : '' %>" id="opt-<%= q.id %>-B">
+        <input type="radio" name="answer_<%= q.id %>" value="B" <%= answersMap[q.id] === 'B' ? 'checked' : '' %> onchange="saveAnswer(<%= q.id %>, 'B', <%= i %>)"> B) <%= q.option_b %>
+      </label>
+      <label class="option-label <%= answersMap[q.id] === 'C' ? 'selected' : '' %>" id="opt-<%= q.id %>-C">
+        <input type="radio" name="answer_<%= q.id %>" value="C" <%= answersMap[q.id] === 'C' ? 'checked' : '' %> onchange="saveAnswer(<%= q.id %>, 'C', <%= i %>)"> C) <%= q.option_c %>
+      </label>
+      <label class="option-label <%= answersMap[q.id] === 'D' ? 'selected' : '' %>" id="opt-<%= q.id %>-D">
+        <input type="radio" name="answer_<%= q.id %>" value="D" <%= answersMap[q.id] === 'D' ? 'checked' : '' %> onchange="saveAnswer(<%= q.id %>, 'D', <%= i %>)"> D) <%= q.option_d %>
+      </label>
+    </div>
+    <% }) %>
+
+    <div class="exam-actions">
+      <button type="submit" class="btn btn-primary" style="padding:12px 40px; font-size:1rem;" onclick="return confirm('Are you sure you want to submit? You cannot change your answers after submission.')">
+        Submit Exam
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+let remainingMs = <%= remainingMs %>;
+const examId = '<%= exam.id %>';
+
+function updateTimer() {
+  if (remainingMs <= 0) {
+    document.getElementById('timer').textContent = '00:00';
+    document.getElementById('examForm').submit();
+    return;
+  }
+  remainingMs -= 1000;
+  const minutes = Math.floor(remainingMs / 60000);
+  const seconds = Math.floor((remainingMs % 60000) / 1000);
+  const timerEl = document.getElementById('timer');
+  timerEl.textContent = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+  if (minutes < 5) timerEl.classList.add('warning');
+}
+
+updateTimer();
+setInterval(updateTimer, 1000);
+
+function saveAnswer(questionId, option, index) {
+  // Update UI
+  document.querySelectorAll('[id^="opt-' + questionId + '-"]').forEach(el => el.classList.remove('selected'));
+  document.getElementById('opt-' + questionId + '-' + option).classList.add('selected');
+  document.getElementById('nav-' + index).classList.add('answered');
+
+  // Save to server
+  fetch('/student/exam/' + examId + '/save-answer', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ question_id: questionId, selected_option: option })
+  });
+}
+
+function scrollToQuestion(index) {
+  document.getElementById('question-' + index).scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+</script>
+<%- include('../partials/footer') %>

@@ -1,0 +1,46 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+<div class="main-content">
+  <div class="topbar">
+    <h1>Faculty Dashboard</h1>
+    <div class="user-info">
+      <span>Welcome, <%= user.name %></span>
+      <a href="/logout" class="btn btn-outline btn-sm">Logout</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Quick Actions</h2>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <a href="/faculty/marks" class="btn btn-primary">Enter Marks</a>
+      <a href="/faculty/results" class="btn btn-success">View Results</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Recent Exams</h2>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr><th>#</th><th>Exam</th><th>Subject</th><th>Date</th><th>Status</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <% exams.forEach((e, i) => { %>
+          <tr>
+            <td><%= i + 1 %></td>
+            <td><%= e.name %></td>
+            <td><%= e.subject_name %></td>
+            <td><%= new Date(e.exam_date).toLocaleDateString() %></td>
+            <td><span class="badge badge-<%= e.status === 'completed' ? 'success' : 'warning' %>"><%= e.status %></span></td>
+            <td><a href="/faculty/marks/<%= e.id %>" class="btn btn-primary btn-sm">Enter Marks</a></td>
+          </tr>
+          <% }) %>
+          <% if (exams.length === 0) { %>
+          <tr><td colspan="6" style="text-align:center; color:#999;">No exams found</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

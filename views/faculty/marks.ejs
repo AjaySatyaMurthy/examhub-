@@ -1,0 +1,78 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+<div class="main-content">
+  <div class="topbar">
+    <h1>Mark Entry</h1>
+  </div>
+
+  <div class="card">
+    <h2>Select Exam</h2>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <% exams.forEach(e => { %>
+        <a href="/faculty/marks/<%= e.id %>" class="btn <%= selectedExam && selectedExam.id === e.id ? 'btn-primary' : 'btn-outline' %> btn-sm">
+          <%= e.subject_name %> - <%= e.name %>
+        </a>
+      <% }) %>
+      <% if (exams.length === 0) { %>
+        <p style="color:#999;">No exams available for mark entry</p>
+      <% } %>
+    </div>
+  </div>
+
+  <% if (selectedExam && students.length > 0) { %>
+  <div class="card">
+    <h2>Enter Marks - <%= selectedExam.subject_name %> (<%= selectedExam.name %>)</h2>
+    <p style="color:#666; margin-bottom:20px; font-size:0.85rem;">Total Marks: <%= selectedExam.total_marks %> | Passing Marks: <%= selectedExam.passing_marks %></p>
+    <form method="POST" action="/faculty/marks/<%= selectedExam.id %>">
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr><th>Roll No</th><th>Name</th><th>Status</th><th>Marks</th></tr>
+          </thead>
+          <tbody>
+            <% students.forEach(s => { %>
+            <tr>
+              <td><%= s.roll_number %></td>
+              <td><%= s.name %></td>
+              <td>
+                <input type="hidden" name="student_ids" value="<%= s.id %>">
+                <select name="statuses" class="form-control" style="width:120px;" onchange="toggleMarks(this)">
+                  <option value="present" <%= s.mark_status === 'present' ? 'selected' : '' %>>Present</option>
+                  <option value="absent" <%= s.mark_status === 'absent' ? 'selected' : '' %>>Absent</option>
+                </select>
+              </td>
+              <td>
+                <input type="number" name="marks" class="form-control" style="width:100px;"
+                  value="<%= s.marks_obtained !== null ? s.marks_obtained : '' %>"
+                  min="0" max="<%= selectedExam.total_marks %>" step="0.5">
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+      <button type="submit" class="btn btn-primary" style="margin-top:15px;">Save Marks</button>
+    </form>
+  </div>
+  <% } else if (selectedExam) { %>
+  <div class="card">
+    <p style="text-align:center; color:#999;">No students found for this exam's department and semester</p>
+  </div>
+  <% } %>
+</div>
+
+<script>
+function toggleMarks(select) {
+  const marksInput = select.closest('tr').querySelector('input[name="marks"]');
+  if (select.value === 'absent') {
+    marksInput.value = '0';
+    marksInput.readOnly = true;
+    marksInput.style.opacity = '0.5';
+  } else {
+    marksInput.value = '';
+    marksInput.readOnly = false;
+    marksInput.style.opacity = '1';
+  }
+}
+</script>
+<%- include('../partials/footer') %>

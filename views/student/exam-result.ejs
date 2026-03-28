@@ -1,0 +1,64 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+<div class="main-content">
+  <div class="topbar">
+    <h1>Exam Result</h1>
+    <a href="/student/exams" class="btn btn-outline">Back to Exams</a>
+  </div>
+
+  <!-- Score Card -->
+  <div class="card" style="text-align:center; padding:40px;">
+    <h2 style="margin-bottom:5px;"><%= exam.subject_name %> - <%= exam.name %></h2>
+    <p style="color:#666; margin-bottom:30px;">Submitted on <%= new Date(attempt.submitted_at).toLocaleString() %></p>
+
+    <div class="stats-grid" style="max-width:600px; margin:0 auto;">
+      <div class="stat-card">
+        <h3 style="color: <%= attempt.obtained_marks >= (attempt.total_marks * 0.4) ? 'var(--success)' : 'var(--danger)' %>;">
+          <%= attempt.obtained_marks %> / <%= attempt.total_marks %>
+        </h3>
+        <p>Score</p>
+      </div>
+      <div class="stat-card">
+        <h3><%= attempt.total_marks > 0 ? ((attempt.obtained_marks / attempt.total_marks) * 100).toFixed(1) : 0 %>%</h3>
+        <p>Percentage</p>
+      </div>
+      <div class="stat-card">
+        <h3 style="color: <%= attempt.obtained_marks >= (attempt.total_marks * 0.4) ? 'var(--success)' : 'var(--danger)' %>;">
+          <%= attempt.obtained_marks >= (attempt.total_marks * 0.4) ? 'PASS' : 'FAIL' %>
+        </h3>
+        <p>Result</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Answer Review -->
+  <div class="card">
+    <h2>Answer Review</h2>
+    <% answers.forEach((a, i) => { %>
+    <div style="border:1px solid <%= a.is_correct ? '#d4edda' : '#f8d7da' %>; border-radius:8px; padding:20px; margin-bottom:12px; background:<%= a.is_correct ? '#f8fff8' : '#fff8f8' %>;">
+      <p style="font-weight:600; margin-bottom:10px;">
+        Q<%= i + 1 %>. <%= a.question_text %>
+        <span class="badge badge-<%= a.is_correct ? 'success' : 'danger' %>"><%= a.is_correct ? 'Correct' : 'Wrong' %> (<%= a.marks %> mark<%= a.marks > 1 ? 's' : '' %>)</span>
+      </p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-left:20px; font-size:0.9rem;">
+        <p style="<%= a.correct_option === 'A' ? 'color:green; font-weight:600;' : '' %><%= a.selected_option === 'A' && a.correct_option !== 'A' ? 'color:red; text-decoration:line-through;' : '' %>">
+          A) <%= a.option_a %> <%= a.correct_option === 'A' ? '✓' : '' %> <%= a.selected_option === 'A' && a.correct_option !== 'A' ? '✗' : '' %>
+        </p>
+        <p style="<%= a.correct_option === 'B' ? 'color:green; font-weight:600;' : '' %><%= a.selected_option === 'B' && a.correct_option !== 'B' ? 'color:red; text-decoration:line-through;' : '' %>">
+          B) <%= a.option_b %> <%= a.correct_option === 'B' ? '✓' : '' %> <%= a.selected_option === 'B' && a.correct_option !== 'B' ? '✗' : '' %>
+        </p>
+        <p style="<%= a.correct_option === 'C' ? 'color:green; font-weight:600;' : '' %><%= a.selected_option === 'C' && a.correct_option !== 'C' ? 'color:red; text-decoration:line-through;' : '' %>">
+          C) <%= a.option_c %> <%= a.correct_option === 'C' ? '✓' : '' %> <%= a.selected_option === 'C' && a.correct_option !== 'C' ? '✗' : '' %>
+        </p>
+        <p style="<%= a.correct_option === 'D' ? 'color:green; font-weight:600;' : '' %><%= a.selected_option === 'D' && a.correct_option !== 'D' ? 'color:red; text-decoration:line-through;' : '' %>">
+          D) <%= a.option_d %> <%= a.correct_option === 'D' ? '✓' : '' %> <%= a.selected_option === 'D' && a.correct_option !== 'D' ? '✗' : '' %>
+        </p>
+      </div>
+      <% if (!a.selected_option) { %>
+        <p style="color:#999; margin-top:8px; margin-left:20px; font-size:0.85rem;">Not answered</p>
+      <% } %>
+    </div>
+    <% }) %>
+  </div>
+</div>
+<%- include('../partials/footer') %>

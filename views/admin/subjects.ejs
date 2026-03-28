@@ -1,0 +1,145 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+<div class="main-content">
+  <div class="topbar">
+    <h1>Subject Management</h1>
+    <button class="btn btn-primary" onclick="toggleModal('addSubjectModal')">+ Add Subject</button>
+  </div>
+
+  <div class="card">
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Code</th><th>Name</th><th>Department</th><th>Semester</th><th>Credits</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% subjects.forEach((s, i) => { %>
+          <tr>
+            <td><%= i + 1 %></td>
+            <td><%= s.code %></td>
+            <td><%= s.name %></td>
+            <td><%= s.dept_name %></td>
+            <td><%= s.semester %></td>
+            <td><%= s.credits %></td>
+            <td>
+              <button class="btn btn-warning btn-sm" onclick='editSubject(<%= JSON.stringify({id: s.id, name: s.name, code: s.code, department_id: s.department_id, semester: s.semester, credits: s.credits}) %>)'>Edit</button>
+              <form method="POST" action="/admin/subjects/delete/<%= s.id %>" style="display:inline;" onsubmit="return confirm('Delete this subject?')">
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+              </form>
+            </td>
+          </tr>
+          <% }) %>
+          <% if (subjects.length === 0) { %>
+          <tr><td colspan="7" style="text-align:center; color:#999;">No subjects added yet</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Add Subject Modal -->
+<div class="modal-overlay" id="addSubjectModal">
+  <div class="modal">
+    <h2>Add Subject</h2>
+    <form method="POST" action="/admin/subjects/add">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Subject Name</label>
+          <input type="text" name="name" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Subject Code</label>
+          <input type="text" name="code" class="form-control" required placeholder="e.g., CS301">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Department</label>
+          <select name="department_id" class="form-control" required>
+            <option value="">Select Department</option>
+            <% departments.forEach(d => { %>
+            <option value="<%= d.id %>"><%= d.name %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Semester</label>
+          <select name="semester" class="form-control" required>
+            <% for(let i = 1; i <= 8; i++) { %>
+            <option value="<%= i %>">Semester <%= i %></option>
+            <% } %>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Credits</label>
+        <input type="number" name="credits" class="form-control" value="3" min="1" max="6">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" onclick="toggleModal('addSubjectModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Add Subject</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Subject Modal -->
+<div class="modal-overlay" id="editSubjectModal">
+  <div class="modal">
+    <h2>Edit Subject</h2>
+    <form method="POST" id="editSubjectForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Subject Name</label>
+          <input type="text" name="name" id="editSubjectName" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Subject Code</label>
+          <input type="text" name="code" id="editSubjectCode" class="form-control" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Department</label>
+          <select name="department_id" id="editSubjectDept" class="form-control" required>
+            <% departments.forEach(d => { %>
+            <option value="<%= d.id %>"><%= d.name %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Semester</label>
+          <select name="semester" id="editSubjectSemester" class="form-control" required>
+            <% for(let i = 1; i <= 8; i++) { %>
+            <option value="<%= i %>">Semester <%= i %></option>
+            <% } %>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Credits</label>
+        <input type="number" name="credits" id="editSubjectCredits" class="form-control" min="1" max="6">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" onclick="toggleModal('editSubjectModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function editSubject(s) {
+  document.getElementById('editSubjectForm').action = '/admin/subjects/edit/' + s.id;
+  document.getElementById('editSubjectName').value = s.name;
+  document.getElementById('editSubjectCode').value = s.code;
+  document.getElementById('editSubjectDept').value = s.department_id;
+  document.getElementById('editSubjectSemester').value = s.semester;
+  document.getElementById('editSubjectCredits').value = s.credits;
+  toggleModal('editSubjectModal');
+}
+</script>
+<%- include('../partials/footer') %>

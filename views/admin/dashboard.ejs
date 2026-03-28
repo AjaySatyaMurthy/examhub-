@@ -1,0 +1,42 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+<div class="main-content">
+  <div class="topbar">
+    <h1>Admin Dashboard</h1>
+    <div class="user-info">
+      <span>Welcome, <%= user.name %></span>
+      <a href="/logout" class="btn btn-outline btn-sm">Logout</a>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h3><%= stats.studentCount %></h3>
+      <p>Total Students</p>
+    </div>
+    <div class="stat-card">
+      <h3><%= stats.facultyCount %></h3>
+      <p>Total Faculty</p>
+    </div>
+    <div class="stat-card">
+      <h3><%= stats.examCount %></h3>
+      <p>Total Exams</p>
+    </div>
+    <div class="stat-card">
+      <h3><%= stats.subjectCount %></h3>
+      <p>Total Subjects</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Quick Actions</h2>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <a href="/admin/students" class="btn btn-primary">Manage Students</a>
+      <a href="/admin/faculty" class="btn btn-primary">Manage Faculty</a>
+      <a href="/admin/exams" class="btn btn-success">Schedule Exam</a>
+      <a href="/admin/hall-tickets" class="btn btn-warning">Generate Hall Tickets</a>
+      <a href="/admin/analytics" class="btn btn-primary">View Analytics</a>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>
