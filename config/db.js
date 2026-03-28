@@ -3,12 +3,13 @@ require('dotenv').config();
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  timezone: '+05:30',
-});
+    user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+          waitForConnections: true,
+            connectionLimit: 10,
+              timezone: '+05:30',
+              });
 
-module.exports = pool;
+              module.exports = pool;
+              
